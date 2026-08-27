@@ -5,3 +5,26 @@
 @media(max-width:600px){.section{padding:85px 5.5vw}.nav{height:72px;padding:0 5.5vw}.hero{padding-top:118px;align-items:start}h1{font-size:clamp(3.7rem,19vw,5.7rem);margin-top:1.5rem}.eyebrow{line-height:1.6}.intro{font-size:.95rem}.actions{flex-direction:column;align-items:stretch}.button{display:flex;justify-content:space-between}.availability{line-height:1.5;align-items:flex-start}.availability span{display:none}.hero-mark{right:-45%;top:16%}.scroll-cue{left:5.5vw}.section-label{margin-bottom:2.5rem}.section-heading{display:block}.expertise-grid,.stack-grid{grid-template-columns:1fr}.expertise-card{min-height:270px}.products{padding-right:0}.products .section-heading,.products .section-label{padding-right:5.5vw}.row-controls{display:none}.project-card{flex-basis:82vw}.client-card{grid-template-columns:35px 58px 1fr 20px;gap:.8rem}.client-mark{width:54px;height:54px;font-size:.75rem}.client-card h3{font-size:1rem}.client-card small{display:none}.workflow-step{min-width:135px}.company-card{padding:2.2rem;min-height:520px}.github-card{grid-template-columns:1fr;padding:2rem;gap:2rem}.code-mark{width:80px;height:80px}.github-card .round-link{grid-column:auto;width:100px;height:100px}.contact{min-height:650px}.contact-links{display:grid;grid-template-columns:1fr 1fr}.project-modal{grid-template-columns:1fr;max-height:93vh}.modal-art{min-height:220px}.modal-art b{font-size:5rem}.modal-content{padding:2rem}.modal-content h2{font-size:2.7rem}.modal-grid{grid-template-columns:1fr;gap:1rem}footer{grid-template-columns:1fr;text-align:left}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}.preloader{display:none}.reveal{opacity:1;transform:none}}
 @media(hover:none){.project-card:hover .poster-art b{transform:none}}
+
+/* Production hardening: consistent interaction, density and wide-screen rhythm. */
+html{scroll-padding-top:82px}
+.section{padding-top:106px;padding-bottom:106px}
+.hero{overflow:hidden}
+:where(a,button,[tabindex]):focus-visible{outline:2px solid #b58cff;outline-offset:4px;border-radius:4px}
+.nav-socials{display:flex;align-items:center;gap:.55rem}
+.nav-socials a{width:31px;height:31px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:#aaa4b1;font-size:.58rem;font-weight:700;transition:border-color .2s,color .2s,background .2s}
+.nav-socials a:hover{color:white;border-color:#9f74ff77;background:#9f74ff12}
+.expertise-icon{width:42px;height:42px;position:relative;display:flex;align-items:center;gap:4px}
+.expertise-icon i{display:block;width:3px;border-radius:2px;background:linear-gradient(to top,#7447d7,#c6a8ff)}
+.expertise-icon i:nth-child(1){height:16px}.expertise-icon i:nth-child(2){height:30px}.expertise-icon i:nth-child(3){height:22px}
+.expertise-card:hover{border-color:#9f74ff44;box-shadow:0 18px 55px #0005,inset 0 1px #b58cff2b}
+.project-card:focus-visible .poster-art,.client-card:focus-visible{border-color:#b58cff}
+.company-card small{display:block;margin-top:1rem;color:#8f8799;text-transform:uppercase;letter-spacing:.22em;font-size:.6rem}
+footer p{display:flex;flex-direction:column;gap:.35rem;margin:0}footer p strong{color:#bdb7c4;font-size:.72rem}
+.mobile-socials{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem}.mobile-socials a{font-size:.72rem!important;border:0!important;color:#a9a2af}
+.modal-content{overscroll-behavior:contain}.modal-close{touch-action:manipulation}
+.contact-links a{min-height:44px;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s,background .2s,transform .2s}.contact-links a:hover{border-color:#9f74ff66;background:#9f74ff0b;transform:translateY(-2px)}
+@media(min-width:1800px){.hero{padding-left:max(7vw,calc((100vw - 1700px)/2));padding-right:max(7vw,calc((100vw - 1700px)/2))}.section:not(.hero):not(.products){padding-left:max(7vw,calc((100vw - 1700px)/2));padding-right:max(7vw,calc((100vw - 1700px)/2))}}
+@media(max-width:1100px){.nav-links{gap:1rem}.nav-socials{display:none}}
+@media(max-width:900px){.mobile-menu{visibility:hidden;pointer-events:none}.mobile-menu.open{visibility:visible;pointer-events:auto}}
+@media(max-width:600px){html{scroll-padding-top:72px}.section{padding-top:76px;padding-bottom:76px}.hero{min-height:100svh;padding-top:110px}.hero-mark{opacity:.28}.section-heading{margin-bottom:2.5rem}.about-layout,.journey-layout{gap:3rem}.contact{min-height:610px}.contact-links{width:100%}.contact-links a{min-width:0}.company-card{min-height:470px}.project-modal{width:min(100%,430px);max-height:calc(100svh - 1rem)}.modal-content{padding:2rem 1.5rem}.modal-art{min-height:190px}footer{padding:2.5rem 5.5vw}}
