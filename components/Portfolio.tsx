@@ -196,7 +196,7 @@ export function Portfolio() {
   const [activeWorkflow, setActiveWorkflow] = useState(0);
   const [activeProduct, setActiveProduct] = useState(0);
   const activeProductRef = useRef(0);
-  const [headerScrolled, setHeaderScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const careerJourney = [...journey].reverse();
   const [activeJourney, setActiveJourney] = useState(careerJourney.length - 1);
   const [activeCurrentRole, setActiveCurrentRole] = useState(0);
@@ -206,7 +206,16 @@ export function Portfolio() {
   const productResumeTimer = useRef(0);
   const productSetWidth = useRef(0);
   const productVisible = useRef(false);
+  const productSyncFrame = useRef(0);
+  const productIgnoreScroll = useRef(false);
+  const productAutoFrame = useRef(0);
+  const startProductAuto = useRef(() => {});
+  const stopProductAuto = useRef(() => {});
   const contactRef = useRef<HTMLElement>(null);
+  const contactMoveFrame = useRef(0);
+  const contactPointer = useRef({ x: 0, y: 0 });
+  const contactFine = useRef(false);
+  const contactReduce = useRef(false);
   const [contactReaction, setContactReaction] = useState<string | null>(null);
   const loopedProducts = Array.from({ length: PRODUCT_LOOP_SETS }, (_, set) =>
     products.map((project) => ({ project, set, loopKey: `${set}-${project.name}` })),
@@ -253,10 +262,36 @@ export function Portfolio() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setHeaderScrolled(window.scrollY > 28);
+    const header = headerRef.current;
+    if (!header) return;
+    let scrolled = header.classList.contains('nav-scrolled');
+    const onScroll = () => {
+      const next = window.scrollY > 28;
+      if (next === scrolled) return;
+      scrolled = next;
+      header.classList.toggle('nav-scrolled', next);
+      header.classList.toggle('nav-top', !next);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const sync = () => {
+      contactReduce.current = reduce.matches;
+      contactFine.current = fine.matches;
+    };
+    sync();
+    reduce.addEventListener('change', sync);
+    fine.addEventListener('change', sync);
+    return () => {
+      reduce.removeEventListener('change', sync);
+      fine.removeEventListener('change', sync);
+      if (contactMoveFrame.current) window.cancelAnimationFrame(contactMoveFrame.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -312,6 +347,7 @@ export function Portfolio() {
   const pauseProducts = () => {
     productPaused.current = true;
     window.clearTimeout(productResumeTimer.current);
+    stopProductAuto.current();
     productRow.current?.classList.add('is-user');
     productRow.current?.classList.remove('is-auto');
   };
@@ -323,6 +359,7 @@ export function Portfolio() {
         productPaused.current = false;
         productRow.current?.classList.add('is-auto');
         productRow.current?.classList.remove('is-user');
+        startProductAuto.current();
       }
     }, 4000);
   };
@@ -406,27 +443,38 @@ export function Portfolio() {
     const row = productRow.current;
     if (!row) return;
     normalizeProductLoop();
-    const center = row.getBoundingClientRect().left + row.clientWidth / 2;
     const cards = Array.from(row.children) as HTMLElement[];
+    const center = row.scrollLeft + row.clientWidth / 2;
+    const span = row.clientWidth * 0.42;
+    const metrics = cards.map((card) => {
+      const mid = card.offsetLeft + card.offsetWidth / 2;
+      const width = card.offsetWidth;
+      return { card, width, distance: Math.abs(mid - center) };
+    });
     let nearest = 0;
     let nearestDistance = Number.POSITIVE_INFINITY;
-    cards.forEach((card) => {
-      const rect = card.getBoundingClientRect();
-      const mid = rect.left + rect.width / 2;
-      const distance = Math.abs(mid - center);
-      const span = row.clientWidth * 0.42;
-      card.classList.toggle('is-active', distance < Math.max(48, rect.width * 0.38));
-      card.classList.toggle('is-near', distance >= Math.max(48, rect.width * 0.38) && distance < span);
+    for (const { card, width, distance } of metrics) {
+      const activeSpan = Math.max(48, width * 0.38);
+      card.classList.toggle('is-active', distance < activeSpan);
+      card.classList.toggle('is-near', distance >= activeSpan && distance < span);
       card.classList.toggle('is-edge', distance >= span);
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearest = Number(card.dataset.productIndex ?? 0);
       }
-    });
+    }
     if (nearest !== activeProductRef.current) {
       activeProductRef.current = nearest;
       setActiveProduct(nearest);
     }
+  };
+
+  const scheduleProductSync = () => {
+    if (productSyncFrame.current) return;
+    productSyncFrame.current = window.requestAnimationFrame(() => {
+      productSyncFrame.current = 0;
+      syncProductIndex();
+    });
   };
 
   useEffect(() => {
@@ -440,41 +488,85 @@ export function Portfolio() {
     const resize = new ResizeObserver(() => measureProductSet());
     resize.observe(row);
 
+    const stopAuto = () => {
+      if (productAutoFrame.current) {
+        window.cancelAnimationFrame(productAutoFrame.current);
+        productAutoFrame.current = 0;
+      }
+    };
+
+    let autoFrames = 0;
+    const tick = () => {
+      productAutoFrame.current = 0;
+      if (
+        !productVisible.current ||
+        productPaused.current ||
+        selected ||
+        reduce.matches ||
+        mobile.matches ||
+        document.hidden
+      ) {
+        return;
+      }
+      productIgnoreScroll.current = true;
+      row.scrollLeft += 0.42;
+      normalizeProductLoop();
+      productIgnoreScroll.current = false;
+      autoFrames += 1;
+      if (autoFrames % 10 === 0) scheduleProductSync();
+      productAutoFrame.current = window.requestAnimationFrame(tick);
+    };
+
+    const startAuto = () => {
+      if (productAutoFrame.current) return;
+      if (
+        productPaused.current ||
+        !productVisible.current ||
+        selected ||
+        reduce.matches ||
+        mobile.matches ||
+        document.hidden
+      ) {
+        return;
+      }
+      productAutoFrame.current = window.requestAnimationFrame(tick);
+    };
+
+    startProductAuto.current = startAuto;
+    stopProductAuto.current = stopAuto;
+
     const visibility = new IntersectionObserver(
       ([entry]) => {
         productVisible.current = entry.isIntersecting;
-        if (entry.isIntersecting && !selected && !reduce.matches && !mobile.matches) {
-          productPaused.current = false;
-          row.classList.add('is-auto');
-        } else {
+        if (!entry.isIntersecting || selected || reduce.matches || mobile.matches) {
           productPaused.current = true;
+          stopAuto();
+          return;
         }
+        if (row.classList.contains('is-user')) return;
+        productPaused.current = false;
+        row.classList.add('is-auto');
+        startAuto();
       },
       { threshold: 0.22 },
     );
     if (section) visibility.observe(section);
 
-    let frame = 0;
-    const tick = () => {
-      if (
-        productVisible.current &&
-        !productPaused.current &&
-        !selected &&
-        !reduce.matches &&
-        !mobile.matches
-      ) {
-        row.scrollLeft += 0.42;
-        normalizeProductLoop();
-      }
-      frame = window.requestAnimationFrame(tick);
+    const onHidden = () => {
+      if (document.hidden) stopAuto();
+      else startAuto();
     };
-    frame = window.requestAnimationFrame(tick);
+    document.addEventListener('visibilitychange', onHidden);
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      stopAuto();
+      if (productSyncFrame.current) window.cancelAnimationFrame(productSyncFrame.current);
       window.clearTimeout(productResumeTimer.current);
       resize.disconnect();
       visibility.disconnect();
+      document.removeEventListener('visibilitychange', onHidden);
+      startProductAuto.current = () => {};
+      stopProductAuto.current = () => {};
     };
   }, [selected]);
 
@@ -504,7 +596,7 @@ export function Portfolio() {
     <>
       <GeetzIntro />
 
-      <header className={`nav ${headerScrolled ? 'nav-scrolled' : 'nav-top'}`}>
+      <header ref={headerRef} className="nav nav-top">
         <a className="brand" href="#overview" aria-label="GEETZ home">
           G<span>EE</span>TZ
         </a>
@@ -700,7 +792,10 @@ export function Portfolio() {
             tabIndex={0}
             role="region"
             aria-label="Product engineering catalogue"
-            onScroll={syncProductIndex}
+            onScroll={() => {
+              if (productIgnoreScroll.current) return;
+              scheduleProductSync();
+            }}
             onPointerEnter={pauseProducts}
             onPointerLeave={() => { if (!productDrag.current.active) scheduleProductResume(); }}
             onFocusCapture={pauseProducts}
@@ -1057,11 +1152,17 @@ export function Portfolio() {
           className="section contact"
           ref={contactRef}
           onPointerMove={(event) => {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-            const rect = event.currentTarget.getBoundingClientRect();
-            event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-            event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`);
+            if (contactReduce.current || !contactFine.current) return;
+            contactPointer.current.x = event.clientX;
+            contactPointer.current.y = event.clientY;
+            const node = event.currentTarget;
+            if (contactMoveFrame.current) return;
+            contactMoveFrame.current = window.requestAnimationFrame(() => {
+              contactMoveFrame.current = 0;
+              const rect = node.getBoundingClientRect();
+              node.style.setProperty('--mx', `${contactPointer.current.x - rect.left}px`);
+              node.style.setProperty('--my', `${contactPointer.current.y - rect.top}px`);
+            });
           }}
         >
           <div className="contact-orb" aria-hidden="true" />

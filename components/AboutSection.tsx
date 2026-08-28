@@ -18,6 +18,9 @@ export function AboutSection({ name }: { name: string }) {
   const [dropSettled, setDropSettled] = useState(false);
   const [compact, setCompact] = useState(false);
   const [finePointer, setFinePointer] = useState(false);
+  const aboutMoveFrame = useRef(0);
+  const aboutPointer = useRef({ x: 0, y: 0 });
+  const aboutRect = useRef<DOMRect | null>(null);
 
   const px = useMotionValue(0);
   const py = useMotionValue(0);
@@ -50,6 +53,7 @@ export function AboutSection({ name }: { name: string }) {
     return () => {
       compactMq.removeEventListener('change', sync);
       fineMq.removeEventListener('change', sync);
+      if (aboutMoveFrame.current) window.cancelAnimationFrame(aboutMoveFrame.current);
     };
   }, []);
 
@@ -64,13 +68,28 @@ export function AboutSection({ name }: { name: string }) {
       id="about"
       ref={rootRef}
       className={`section about${live ? ' is-in' : ''}${hang ? ' is-live' : ''}`}
+      onPointerEnter={(event) => {
+        aboutRect.current = event.currentTarget.getBoundingClientRect();
+      }}
       onPointerMove={(event) => {
         if (!parallax) return;
-        const rect = event.currentTarget.getBoundingClientRect();
-        px.set((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5);
-        py.set((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5);
+        aboutPointer.current.x = event.clientX;
+        aboutPointer.current.y = event.clientY;
+        if (aboutMoveFrame.current) return;
+        aboutMoveFrame.current = window.requestAnimationFrame(() => {
+          aboutMoveFrame.current = 0;
+          const rect = aboutRect.current;
+          if (!rect) return;
+          px.set((aboutPointer.current.x - rect.left) / Math.max(1, rect.width) - 0.5);
+          py.set((aboutPointer.current.y - rect.top) / Math.max(1, rect.height) - 0.5);
+        });
       }}
       onPointerLeave={() => {
+        if (aboutMoveFrame.current) {
+          window.cancelAnimationFrame(aboutMoveFrame.current);
+          aboutMoveFrame.current = 0;
+        }
+        aboutRect.current = null;
         px.set(0);
         py.set(0);
       }}

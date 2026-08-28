@@ -36,58 +36,65 @@ export function GeetzIntro() {
     let mx = 0;
     let my = 0;
     let frame = 0;
+    let enterFrame = 0;
+    let visible = true;
+    let letters: HTMLElement[] = [];
+
+    const cacheLetters = () => {
+      letters = wordRef.current
+        ? Array.from(wordRef.current.querySelectorAll<HTMLElement>('.geetz-letter'))
+        : [];
+    };
 
     const setEnter = () => {
+      enterFrame = 0;
       if (reduce.matches) {
         root.style.setProperty('--enter', '0');
         return;
       }
+      if (!visible) return;
       const rect = root.getBoundingClientRect();
       const travel = Math.max(1, rect.height * 0.55);
       const enter = Math.min(1, Math.max(0, window.scrollY / travel));
       root.style.setProperty('--enter', enter.toFixed(3));
     };
 
+    const scheduleEnter = () => {
+      if (!enterFrame) enterFrame = window.requestAnimationFrame(setEnter);
+    };
+
     const applyPointer = () => {
       frame = 0;
-      if (!fine.matches || reduce.matches) return;
+      if (!visible || !fine.matches || reduce.matches) return;
 
       const rect = root.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
-      const x = mx - rect.left;
-      const y = my - rect.top;
-      root.style.setProperty('--mx', `${x}px`);
-      root.style.setProperty('--my', `${y}px`);
+      root.style.setProperty('--mx', `${mx - rect.left}px`);
+      root.style.setProperty('--my', `${my - rect.top}px`);
       root.classList.add('is-lit');
 
       const companion = companionRef.current;
       const word = wordRef.current;
       if (companion && ready) {
         const c = companion.getBoundingClientRect();
-        const cx = c.left + c.width / 2;
-        const cy = c.top + c.height * 0.28;
-        const dx = mx - cx;
-        const dy = my - cy;
-        const dist = Math.hypot(dx, dy);
-        const near = dist < 92;
+        const dx = mx - (c.left + c.width / 2);
+        const dy = my - (c.top + c.height * 0.28);
+        const near = Math.hypot(dx, dy) < 92;
         if (near !== awareRef.current) {
           awareRef.current = near;
           setAware(near);
         }
 
-        const ex = Math.max(-1.6, Math.min(1.6, dx / 110));
-        const ey = Math.max(-1.2, Math.min(1.2, dy / 110));
-        companion.style.setProperty('--ex', `${ex}px`);
-        companion.style.setProperty('--ey', `${ey}px`);
+        companion.style.setProperty('--ex', `${Math.max(-1.6, Math.min(1.6, dx / 110))}px`);
+        companion.style.setProperty('--ey', `${Math.max(-1.2, Math.min(1.2, dy / 110))}px`);
         companion.style.setProperty(
           '--head',
           near ? `${Math.max(-3.6, Math.min(3.6, dx / 42))}deg` : '0deg',
         );
       }
 
-      const letters = word?.querySelectorAll<HTMLElement>('.geetz-letter');
-      if (letters && word) {
+      if (letters.length && word) {
         const wr = word.getBoundingClientRect();
         const overWord =
           mx >= wr.left - 24 &&
@@ -95,21 +102,19 @@ export function GeetzIntro() {
           my >= wr.top - 36 &&
           my <= wr.bottom + 20;
         let overG = false;
-        letters.forEach((letter, index) => {
+        for (let index = 0; index < letters.length; index += 1) {
+          const letter = letters[index];
           if (!overWord) {
             letter.style.setProperty('--lit', '0');
-            return;
+            continue;
           }
           const lr = letter.getBoundingClientRect();
           const mid = lr.left + lr.width / 2;
-          const falloff = lr.width * 1.35;
-          const lit = Math.max(0, 1 - Math.abs(mx - mid) / falloff);
-          letter.style.setProperty('--lit', lit.toFixed(3));
+          letter.style.setProperty('--lit', Math.max(0, 1 - Math.abs(mx - mid) / (lr.width * 1.35)).toFixed(3));
           if (index === 0) {
-            overG =
-              mx >= lr.left && mx <= lr.right && my >= lr.top && my <= lr.bottom;
+            overG = mx >= lr.left && mx <= lr.right && my >= lr.top && my <= lr.bottom;
           }
-        });
+        }
         if (overG !== homeRef.current) {
           homeRef.current = overG;
           setHome(overG);
@@ -123,18 +128,47 @@ export function GeetzIntro() {
       if (!frame) frame = window.requestAnimationFrame(applyPointer);
     };
 
+    const attachPointer = () => {
+      if (fine.matches && !reduce.matches) {
+        window.addEventListener('pointermove', onMove, { passive: true });
+      }
+    };
+
+    const detachPointer = () => {
+      window.removeEventListener('pointermove', onMove);
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
+    };
+
+    cacheLetters();
     setEnter();
-    window.addEventListener('scroll', setEnter, { passive: true });
-    window.addEventListener('resize', setEnter, { passive: true });
-    if (fine.matches && !reduce.matches) {
-      window.addEventListener('pointermove', onMove, { passive: true });
-    }
+    window.addEventListener('scroll', scheduleEnter, { passive: true });
+    window.addEventListener('resize', scheduleEnter, { passive: true });
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) {
+          cacheLetters();
+          attachPointer();
+          scheduleEnter();
+        } else {
+          detachPointer();
+        }
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(root);
+    attachPointer();
 
     return () => {
-      window.removeEventListener('scroll', setEnter);
-      window.removeEventListener('resize', setEnter);
-      window.removeEventListener('pointermove', onMove);
-      if (frame) window.cancelAnimationFrame(frame);
+      detachPointer();
+      window.removeEventListener('scroll', scheduleEnter);
+      window.removeEventListener('resize', scheduleEnter);
+      if (enterFrame) window.cancelAnimationFrame(enterFrame);
+      io.disconnect();
     };
   }, [ready]);
 
