@@ -28,6 +28,12 @@ yarn-error.log*
 
 # local environment
 .env*
+!.env.example
+
+# local QA / packaging artifacts
+.qa-intro/
+site-package.tar.gz
+.claude/
 
 # deployment and generated files
 .vercel
