@@ -17,18 +17,59 @@ import {
 import { GeetzIntro } from './GeetzIntro';
 import { GeetzCompanionMark } from './GeetzCompanion';
 import { HeroOrbit } from './HeroOrbit';
-import { AboutGate } from './AboutGate';
+import { SectorsSection } from './SectorsSection';
 
 const PRODUCT_LOOP_SETS = 3;
 
 const nav = [
-  { id: 'about', label: 'About', desc: 'Founder mindset, engineer’s discipline.' },
+  { id: 'about', label: 'About', desc: 'CTO mindset, engineer’s discipline.' },
   { id: 'expertise', label: 'Expertise', desc: 'Full-stack engineering to AI integration.' },
   { id: 'products', label: 'Products', desc: 'Selected commercial platforms.' },
   { id: 'client-work', label: 'Client Work', desc: 'Real businesses, real engagements.' },
   { id: 'journey', label: 'Journey', desc: 'Professional chronology, 2016 — present.' },
   { id: 'contact', label: 'Contact', desc: 'Start a conversation.' },
 ];
+
+type ArchLayer = { label: string; items: string[] };
+type ArchSpec = { layers: ArchLayer[]; intelligence?: { items: string[]; note: string } };
+
+const architectureByProduct: Record<string, ArchSpec> = {
+  EDNORYX: {
+    layers: [
+      { label: 'Experience / UI', items: ['React'] },
+      { label: 'API Layer', items: ['FastAPI', 'REST APIs'] },
+      { label: 'Services', items: ['LMS', 'Assessments & quizzes', 'Student / Teacher / Parent workflows'] },
+      { label: 'Data', items: ['PostgreSQL — student, grade & progress records'] },
+    ],
+    intelligence: {
+      items: ['AI service/provider integration', 'LLM orchestration & grounding', 'AI-assisted teacher & assessment workflows'],
+      note: 'Development-stage within the MVP environment — not a commercially deployed production assistant.',
+    },
+  },
+  'Enterprise ERP Platform': {
+    layers: [
+      { label: 'Experience / UI', items: ['React'] },
+      { label: 'API Layer', items: ['FastAPI', 'REST APIs'] },
+      { label: 'Services', items: ['Modular enterprise modules', 'Workflow automation'] },
+      { label: 'Data', items: ['PostgreSQL — multi-module schema'] },
+    ],
+    intelligence: {
+      items: ['Feature-specific AI in select modules (e.g. education/intelligence workflows)'],
+      note: 'Partial / feature-specific implementation — not platform-wide production AI.',
+    },
+  },
+  Farmora: {
+    layers: [
+      { label: 'API Layer', items: ['FastAPI', 'REST APIs'] },
+      { label: 'Services', items: ['Environment monitoring', 'Production management domain services'] },
+      { label: 'Data', items: ['Domain models — environment, crop & production tracking'] },
+    ],
+    intelligence: {
+      items: ['Architecture + development direction only'],
+      note: 'Not yet implemented — roadmap capability. No autonomous intelligence, computer vision or robotics today.',
+    },
+  },
+};
 
 const socials = [
   { label: 'LinkedIn', shortLabel: 'in', url: profile.linkedin },
@@ -217,8 +258,11 @@ export function Portfolio() {
   const contactFine = useRef(false);
   const contactReduce = useRef(false);
   const [contactReaction, setContactReaction] = useState<string | null>(null);
+  const tier1Products = products.filter((p) => p.tier === 1);
+  const tier2Products = products.filter((p) => p.tier === 2);
+  const tier3Products = products.filter((p) => p.tier === 3);
   const loopedProducts = Array.from({ length: PRODUCT_LOOP_SETS }, (_, set) =>
-    products.map((project) => ({ project, set, loopKey: `${set}-${project.name}` })),
+    tier3Products.map((project) => ({ project, set, loopKey: `${set}-${project.name}` })),
   ).flat();
   const modalRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -368,8 +412,8 @@ export function Portfolio() {
     const row = productRow.current;
     if (!row) return;
     const cards = Array.from(row.children) as HTMLElement[];
-    if (cards.length < products.length + 1) return;
-    const width = cards[products.length].offsetLeft - cards[0].offsetLeft;
+    if (cards.length < tier3Products.length + 1) return;
+    const width = cards[tier3Products.length].offsetLeft - cards[0].offsetLeft;
     if (width > 8) {
       const previous = productSetWidth.current;
       productSetWidth.current = width;
@@ -389,7 +433,7 @@ export function Portfolio() {
   };
 
   const goToProduct = (index: number) => {
-    const next = ((index % products.length) + products.length) % products.length;
+    const next = ((index % tier3Products.length) + tier3Products.length) % tier3Products.length;
     pauseProducts();
     scheduleProductResume();
     const row = productRow.current;
@@ -584,10 +628,10 @@ export function Portfolio() {
     wide?: boolean;
   }[] = [
     { label: 'Email Me', hint: 'Start a project', href: profile.email ? `mailto:${profile.email}` : '', reaction: 'email' },
+    { label: 'LinkedIn', hint: 'Connect professionally', href: profile.linkedin, reaction: 'linkedin' },
     { label: 'WhatsApp', hint: "Let's talk", href: profile.whatsapp, reaction: 'whatsapp', ariaLabel: 'Contact Geetha on WhatsApp' },
-    { label: 'LinkedIn', hint: 'Connect with me', href: profile.linkedin, reaction: 'linkedin' },
     { label: 'GitHub', hint: 'Explore my code', href: profile.github, reaction: 'github' },
-    { label: "Kripra's Digital AI", hint: 'Visit company website', href: profile.companyWebsite, reaction: 'kripra', wide: true },
+    { label: 'KriPra Digital AI', hint: 'Venture in development', href: profile.companyWebsite, reaction: 'kripra', wide: true },
   ];
 
   const stackVisual = (name: string) => name.toLowerCase().replace(/[^a-z]+/g, '-');
@@ -674,7 +718,7 @@ export function Portfolio() {
             </ExternalLink>
           ))}
           <ExternalLink href={profile.companyWebsite}>
-            Kripra&apos;s Digital AI ↗
+            KriPra Digital AI ↗
           </ExternalLink>
         </div>
       </div>
@@ -686,7 +730,7 @@ export function Portfolio() {
           <div className="hero-copy">
             <p className="eyebrow">
               <span />
-              Senior AI Product Engineer · Python Full-Stack Developer
+              CTO @ Krishvi International · AI &amp; Enterprise Product Builder
             </p>
             <h1>
               Ideas, engineered
@@ -694,12 +738,22 @@ export function Portfolio() {
               into <em>impact.</em>
             </h1>
             <p className="intro">
-              I&apos;m <strong>Geetha K S</strong>, Founder of Kripra&apos;s
-              Digital AI Pvt. Ltd. Over 8+ years I&apos;ve built enterprise
-              applications and AI-assisted platforms — Python/FastAPI backends,
-              React frontends, and LLM-enabled workflows — from concept to
-              production.
+              I&apos;m <strong>Geetha K S</strong>, CTO at Krishvi International
+              and a software engineer focused on turning complex operational
+              problems into scalable digital products. My work spans enterprise
+              architecture, full-stack engineering, system integration and
+              AI-assisted product development.
             </p>
+            <p className="intro">
+              Alongside technology leadership, I architect and build enterprise
+              platforms and AI-enabled products across education, enterprise
+              operations and agriculture.
+            </p>
+            <div className="hero-facts" aria-label="Quick facts">
+              <div><strong>9+</strong><span>Years Across Technology &amp; Engineering</span></div>
+              <div><strong>CTO</strong><span>Krishvi International</span></div>
+              <div><strong>AI &amp; Enterprise</strong><span>Product Builder</span></div>
+            </div>
             <div className="actions">
               <a className="button primary" href="#products">
                 Explore my work <span>↓</span>
@@ -721,7 +775,107 @@ export function Portfolio() {
           </div>
         </section>
 
-        <AboutGate name={profile.name} />
+        <section id="about-redesign" className="section about-redesign-section">
+          <div className="section-label reveal">
+            <span>—</span> About
+          </div>
+          <div className="about-redesign reveal">
+            <div className="about-portrait-col">
+              <div className="id-badge-wrap">
+                <div className="id-badge-lanyard" aria-hidden="true">
+                  <span className="id-badge-clip" />
+                </div>
+                <div className="id-badge-card">
+                  <div className="id-badge-top">
+                    <span className="id-badge-chip" aria-hidden="true" />
+                    <span className="id-badge-label">EXECUTIVE ACCESS</span>
+                  </div>
+                  <div className="id-badge-photo">
+                    <Image
+                      src="/geetha-ks-portrait.jpg"
+                      alt={profile.name}
+                      fill
+                      sizes="220px"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className="id-badge-info">
+                    <h3>{profile.name}</h3>
+                    <p>CTO · Software Engineer · Product Builder</p>
+                    <span className="id-badge-org">Krishvi International</span>
+                  </div>
+                  <div className="id-badge-footer">
+                    <img
+                      className="id-badge-qr"
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=90x90&margin=0&color=9f74ff&bgcolor=0a0810&data=${encodeURIComponent(profile.linkedin)}`}
+                      alt="QR code linking to LinkedIn profile"
+                      width={54}
+                      height={54}
+                      loading="lazy"
+                    />
+                    <div className="id-badge-cred">
+                      <span>CREDENTIAL</span>
+                      <b>ACTIVE</b>
+                    </div>
+                  </div>
+                  <span className="id-badge-edge" aria-hidden="true" />
+                </div>
+              </div>
+            </div>
+
+            <div className="about-bio-col">
+              <h3>Technology leadership meets engineering.</h3>
+              <p>
+                I&apos;m a hands-on CTO and software engineer building enterprise
+                platforms and AI-enabled products. My approach: start with the
+                operational problem, build the right architecture, engineer with
+                precision, integrate with purpose.
+              </p>
+              <p>
+                I lead technology strategy at Krishvi International while
+                architecting independent products spanning education, enterprise
+                operations and agriculture.
+              </p>
+              <div className="cto-scope">
+                <span>CTO Scope — Krishvi International</span>
+                <ul>
+                  <li>Technology strategy &amp; direction</li>
+                  <li>Strategic IT planning</li>
+                  <li>System integration</li>
+                  <li>Digital transformation</li>
+                  <li>Software/product development</li>
+                  <li>AI-focused project development</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="about-career-col">
+              <h4>Career Progression</h4>
+              <div className="career-flow-item">
+                <span>2017</span>
+                <strong>Software Engineering</strong>
+              </div>
+              <div className="career-flow-item">
+                <span>2018–2021</span>
+                <strong>Enterprise Systems &amp; Infrastructure</strong>
+              </div>
+              <div className="career-flow-item">
+                <span>2021–2022</span>
+                <strong>Product &amp; Systems Engineering</strong>
+              </div>
+              <div className="career-flow-item">
+                <span>2022–2024</span>
+                <strong>Technology Consulting</strong>
+              </div>
+              <div className="career-flow-item current">
+                <span>2024–Present</span>
+                <strong>Technology Leadership / CTO</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <SectorsSection />
 
         <section id="expertise" className="section expertise">
           <div className="section-label reveal">
@@ -765,20 +919,136 @@ export function Portfolio() {
                 Products with <em>purpose.</em>
               </h2>
               <p>
-                A selected portfolio of AI, SaaS and enterprise platforms
-                I&apos;ve architected, engineered or contributed to across real
-                operational domains.
+                Flagship platforms I&apos;ve architected and engineered — each
+                labeled by actual development stage, not marketing language.
               </p>
             </div>
           </div>
+
+          <div className="products-flagship-label reveal">
+            <span>Tier 1</span> Domain Flagships — core platform engineering
+          </div>
+          <div className="flagship-showcase reveal">
+            {tier1Products.map((project, index) => {
+              const arch = architectureByProduct[project.name];
+              return (
+              <article className="flagship-showcase-card" key={project.name} style={{ '--accent': project.accent } as React.CSSProperties}>
+                <div className={`poster-art visual-${project.visual ?? 'modules'}`} aria-hidden="true">
+                  <span className="poster-grid" />
+                  <span className="product-system"><i /><i /><i /><i /><i /></span>
+                  <b>{project.monogram}</b>
+                  <em>{String(index + 1).padStart(2, '0')}</em>
+                </div>
+                <div className="flagship-showcase-copy">
+                  <p className="flagship-category">{project.displayCategory ?? project.category}</p>
+                  <h3>{project.name}</h3>
+                  <p className="flagship-desc">{project.description}</p>
+                  {project.role && (
+                    <p className="flagship-meta"><span>My Contribution</span>{project.role}</p>
+                  )}
+                  {project.technologies.length > 0 && (
+                    <p className="flagship-meta"><span>Technology</span>{project.technologies.join(' · ')}</p>
+                  )}
+                  {project.status && <span className="status-badge">{project.status}</span>}
+
+                  {arch && (
+                    <div className="arch-diagram">
+                      <span className="arch-diagram-label">System architecture</span>
+                      <div className="arch-stack">
+                        {arch.layers.map((layer, li) => (
+                          <div className="arch-layer" key={layer.label}>
+                            <div
+                              className="arch-layer-row"
+                              tabIndex={0}
+                              style={{ '--arch-d': `${li * 340}ms` } as React.CSSProperties}
+                            >
+                              <span className="arch-layer-name">{layer.label}</span>
+                              <span className="arch-layer-items">{layer.items.join(' · ')}</span>
+                            </div>
+                            {li < arch.layers.length - 1 && (
+                              <svg
+                                className="arch-connector-svg"
+                                viewBox="0 0 2 16"
+                                preserveAspectRatio="none"
+                                aria-hidden="true"
+                                style={{ '--arch-d': `${li * 340 + 170}ms` } as React.CSSProperties}
+                              >
+                                <line pathLength="1" x1="1" y1="0" x2="1" y2="16" />
+                              </svg>
+                            )}
+                          </div>
+                        ))}
+                        {arch.intelligence && (
+                          <div className="arch-branch" style={{ '--arch-d': `${arch.layers.length * 340}ms` } as React.CSSProperties}>
+                            <svg className="arch-branch-svg" viewBox="0 0 22 16" preserveAspectRatio="none" aria-hidden="true">
+                              <path pathLength="1" d="M1,0 L1,9 Q1,14 6,14 L22,14" fill="none" />
+                            </svg>
+                            <div
+                              className="arch-intelligence"
+                              tabIndex={0}
+                              style={{ '--arch-d': `${arch.layers.length * 340 + 160}ms` } as React.CSSProperties}
+                            >
+                              <span className="arch-layer-name">Intelligence layer <em>(optional / where applicable)</em></span>
+                              <span className="arch-layer-items">{arch.intelligence.items.join(' · ')}</span>
+                              <p className="arch-intelligence-note">{arch.intelligence.note}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <button className="flagship-explore" onClick={() => openProject(project)}>
+                    Explore product <i aria-hidden="true">↗</i>
+                  </button>
+                </div>
+              </article>
+            );})}
+          </div>
+
+          <div className="products-flagship-label reveal">
+            <span>Tier 2</span> Strategic AI Flagships — AI-focused product architecture
+          </div>
+          <div className="flagship-showcase tier-2 reveal">
+            {tier2Products.map((project, index) => (
+              <article className="flagship-showcase-card" key={project.name} style={{ '--accent': project.accent } as React.CSSProperties}>
+                <div className={`poster-art visual-${project.visual ?? 'modules'}`} aria-hidden="true">
+                  <span className="poster-grid" />
+                  <span className="product-system"><i /><i /><i /><i /><i /></span>
+                  <b>{project.monogram}</b>
+                  <em>{String(index + 1).padStart(2, '0')}</em>
+                </div>
+                <div className="flagship-showcase-copy">
+                  <p className="flagship-category">{project.displayCategory ?? project.category}</p>
+                  <h3>{project.name}</h3>
+                  <p className="flagship-desc">{project.description}</p>
+                  {project.role && (
+                    <p className="flagship-meta"><span>My Contribution</span>{project.role}</p>
+                  )}
+                  {project.status && <span className="status-badge">{project.status}</span>}
+                  <button className="flagship-explore" onClick={() => openProject(project)}>
+                    Explore product <i aria-hidden="true">↗</i>
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="products-supporting-label reveal">
+            <span>Tier 3</span> Other Products / Explorations
+          </div>
+          <p className="products-supporting-note reveal">
+            Broader product experimentation. Evidence and maturity under individual review.
+          </p>
+
           <div className="motion-rail-head reveal" style={{ '--delay': '120ms' } as React.CSSProperties}>
             <div>
-              <span>Selected product systems</span>
-              <p>{products.length} product systems · use wheel, drag, swipe or arrow keys to explore.</p>
+              <span>Product explorations</span>
+              <p>{tier3Products.length} product explorations · use wheel, drag, swipe or arrow keys to explore.</p>
             </div>
             <div className="product-progress" aria-live="polite">
-              <span>{String(activeProduct + 1).padStart(2, '0')} / {String(products.length).padStart(2, '0')}</span>
-              <i aria-hidden="true"><b style={{ width: `${((activeProduct + 1) / products.length) * 100}%` }} /></i>
+              <span>{String(activeProduct + 1).padStart(2, '0')} / {String(tier3Products.length).padStart(2, '0')}</span>
+              <i aria-hidden="true"><b style={{ width: `${((activeProduct + 1) / tier3Products.length) * 100}%` }} /></i>
             </div>
             <div className="row-controls">
               <button onClick={() => nudgeProduct(-1)} aria-label="Previous product">←</button>
@@ -843,9 +1113,9 @@ export function Portfolio() {
               <ProjectCard
                 key={loopKey}
                 project={project}
-                index={index % products.length}
+                index={index % tier3Products.length}
                 onOpen={openProject}
-                active={activeProduct === index % products.length}
+                active={activeProduct === index % tier3Products.length}
                 animate={false}
               />
             ))}
@@ -1015,7 +1285,7 @@ export function Portfolio() {
                 Building forward,<br />
                 <em>one layer at a time.</em>
               </h2>
-              <p>8+ years of engineering evolution — from enterprise systems to building and leading AI products.</p>
+              <p>9+ years of engineering evolution — from software and enterprise systems to technology leadership and AI product development.</p>
               <div className="journey-range"><span>2016</span><i /><span>Present</span></div>
             </div>
             <div className="career-architecture reveal">
@@ -1024,68 +1294,81 @@ export function Portfolio() {
               </div>
               <div className="career-grid">
                 <ol className="career-rail" aria-label="Professional journey from 2016 to present">
-                  {careerJourney.map((item, index) => (
-                    <li className={`${activeJourney === index ? 'active' : ''} ${item.currentRoles ? 'current current-dual' : ''}`} key={item.org + item.period}>
+                  {careerJourney.map((item, index) => {
+                    const isCurrentCTO = item.org === 'Krishvi International';
+                    return (
+                    <li className={`${activeJourney === index ? 'active' : ''} ${isCurrentCTO ? 'current' : ''}`} key={item.org + item.period}>
                       <button onClick={() => setActiveJourney(index)} aria-pressed={activeJourney === index}>
                         <span>{item.period.split('—')[0].trim()}</span>
                         <i aria-hidden="true" />
                         <div>
                           <small>{item.stage}</small>
-                          <h3>{item.currentRoles ? 'Two current roles' : item.role}</h3>
-                          <p>{item.currentRoles ? 'Pragatham · Kripra’s Digital AI' : item.org}</p>
+                          <h3>{item.role}</h3>
+                          <p>{item.org}</p>
                         </div>
-                        {item.currentRoles && <em>NOW</em>}
+                        {isCurrentCTO && <em>NOW</em>}
                       </button>
                       {activeJourney === index && (
                         <div className="career-mobile-detail">
-                          {item.currentRoles ? (
-                            <div className="current-role-stack" aria-label="Concurrent professional roles">
-                              {item.currentRoles.map(role => (
-                                <article className="current-role-card" key={role.org}>
-                                  <small>{role.label}</small>
-                                  <h4>{role.role}</h4>
-                                  <p>{role.org}</p>
-                                  <span>{item.period}</span>
-                                </article>
-                              ))}
-                            </div>
-                          ) : (
-                            <>
+                          <>
                               <p>{item.period}{item.location ? ` · ${item.location}` : ''}</p>
                               <span>{item.detail}</span>
                               {item.signals && <ul>{item.signals.map(signal => <li key={signal}>{signal}</li>)}</ul>}
+                              {isCurrentCTO && (
+                                <div className="journey-current-hierarchy">
+                                  <div className="journey-primary-card">
+                                    <h4>Chief Technology Officer</h4>
+                                    <p>Krishvi International · 2024 — Present</p>
+                                    <ul>
+                                      <li>Technology strategy &amp; direction</li>
+                                      <li>Strategic IT planning</li>
+                                      <li>System integration</li>
+                                      <li>Digital transformation</li>
+                                      <li>Software/product development</li>
+                                      <li>AI-focused project development</li>
+                                    </ul>
+                                  </div>
+                                  <div className="journey-parallel-card">
+                                    <h4>Independent Product Building → KriPra Digital AI</h4>
+                                    <p>Venture in Development · Company registration in progress</p>
+                                    <p className="separation-note">Separate from Krishvi International — not operated by or part of Krishvi International.</p>
+                                  </div>
+                                </div>
+                              )}
                             </>
-                          )}
                         </div>
                       )}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ol>
-                <article className={`career-detail ${careerJourney[activeJourney].currentRoles ? 'career-detail-current' : ''}`} aria-live="polite">
-                  {careerJourney[activeJourney].currentRoles ? (
-                    <>
-                      <span>2025 — Present · Concurrent roles</span>
-                      <h3>Engineering practice.<br /><em>Founder vision.</em></h3>
-                      <div className="current-branch" aria-label="Current concurrent professional roles">
-                        {careerJourney[activeJourney].currentRoles?.map((role, index) => (
-                          <button className={activeCurrentRole === index ? 'active' : ''} key={role.org} onClick={() => setActiveCurrentRole(index)} aria-pressed={activeCurrentRole === index}>
-                            <small>{role.label}</small>
-                            <strong>{role.role}</strong>
-                            <span>{role.org}</span>
-                            <em>{role.type}</em>
-                          </button>
-                        ))}
+                <article className="career-detail" aria-live="polite">
+                  <span>{careerJourney[activeJourney].stage}</span>
+                  <h3>{careerJourney[activeJourney].role}</h3>
+                  <p className="career-org">{careerJourney[activeJourney].org}</p>
+                  <p className="career-period">{careerJourney[activeJourney].period}{careerJourney[activeJourney].location ? ` · ${careerJourney[activeJourney].location}` : ''}</p>
+                  <p>{careerJourney[activeJourney].detail}</p>
+                  {careerJourney[activeJourney].signals && <ul>{careerJourney[activeJourney].signals?.map(signal => <li key={signal}>{signal}</li>)}</ul>}
+                  {careerJourney[activeJourney].org === 'Krishvi International' && (
+                    <div className="journey-current-hierarchy">
+                      <div className="journey-primary-card">
+                        <h4>Chief Technology Officer</h4>
+                        <p>Krishvi International · 2024 — Present</p>
+                        <ul>
+                          <li>Technology strategy &amp; direction</li>
+                          <li>Strategic IT planning</li>
+                          <li>System integration</li>
+                          <li>Digital transformation</li>
+                          <li>Software/product development</li>
+                          <li>AI-focused project development</li>
+                        </ul>
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <span>{careerJourney[activeJourney].stage}</span>
-                      <h3>{careerJourney[activeJourney].role}</h3>
-                      <p className="career-org">{careerJourney[activeJourney].org}</p>
-                      <p className="career-period">{careerJourney[activeJourney].period}{careerJourney[activeJourney].location ? ` · ${careerJourney[activeJourney].location}` : ''}</p>
-                      <p>{careerJourney[activeJourney].detail}</p>
-                      {careerJourney[activeJourney].signals && <ul>{careerJourney[activeJourney].signals?.map(signal => <li key={signal}>{signal}</li>)}</ul>}
-                    </>
+                      <div className="journey-parallel-card">
+                        <h4>Independent Product Building → KriPra Digital AI</h4>
+                        <p>Venture in Development · Company registration in progress</p>
+                        <p className="separation-note">Separate from Krishvi International — not operated by or part of Krishvi International.</p>
+                      </div>
+                    </div>
                   )}
                 </article>
               </div>
@@ -1096,21 +1379,23 @@ export function Portfolio() {
         <section id="company" className="section company">
           <div className="company-card reveal">
             <div className="company-copy-left">
-              <p>Company / Founder</p>
+              <p>Founder Initiative</p>
               <h2>
-                Kripra&apos;s
+                KriPra
                 <br />
                 Digital AI
               </h2>
-              <small>Pvt. Ltd.</small>
+              <small>Venture in Development</small>
             </div>
             <div className="company-copy-right">
               <p>
-                A technology company focused on thoughtful AI and software
-                solutions for modern businesses.
+                Building AI-assisted and enterprise software platforms.
+                Company registration in progress. A parallel independent
+                direction alongside my primary role as CTO at Krishvi
+                International.
               </p>
               <ExternalLink className="text-link" href={profile.companyWebsite}>
-                Visit company website <span>↗</span>
+                Visit venture website <span>↗</span>
               </ExternalLink>
             </div>
             <b aria-hidden="true">K</b>
@@ -1118,7 +1403,7 @@ export function Portfolio() {
               <li>Idea</li>
               <li>Engineering</li>
               <li>AI</li>
-              <li>Product</li>
+              <li>Venture</li>
             </ol>
           </div>
         </section>
@@ -1172,10 +1457,10 @@ export function Portfolio() {
             Start a conversation
           </p>
           <h2 className="reveal">
-            Have an idea
+            Building something
             <br />
             <em>
-              worth building?
+              ambitious?
               <span className={`contact-cameo${contactReaction ? ` is-${contactReaction}` : ''}`} aria-hidden="true">
                 <GeetzCompanionMark />
                 <i className="cameo-signal" />
@@ -1183,8 +1468,9 @@ export function Portfolio() {
             </em>
           </h2>
           <p className="reveal">
-            Let&apos;s turn ambitious ideas into thoughtful, scalable digital
-            products.
+            Let&apos;s engineer it with clarity. Open to conversations around
+            enterprise platforms, AI product development, technology
+            partnerships and complex software systems.
           </p>
           <div className="contact-grid reveal">
             {contactCards.map((card) => (
@@ -1213,7 +1499,7 @@ export function Portfolio() {
               G<span>EE</span>TZ
             </a>
             <p className="footer-name">{profile.name}</p>
-            <p className="footer-role">Founder · Software Engineer · AI Product Builder</p>
+            <p className="footer-role">CTO · Software Engineer · AI &amp; Enterprise Product Builder</p>
             <p className="footer-philosophy">
               Building intelligent products.
               <br />

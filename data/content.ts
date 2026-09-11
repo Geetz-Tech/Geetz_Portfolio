@@ -1,6 +1,6 @@
-export type Project={name:string;category:string;displayCategory?:string;description:string;private?:boolean;featured?:boolean;needsReview?:boolean;accent:string;monogram:string;role?:string;technologies:string[];status:string;website?:string;industry?:string;focus?:string[];visual?:'network'|'signal'|'modules'|'ledger'|'routes'|'campus'|'growth'|'legal';logo?:{src:string;width:number;height:number}};
+export type Project={name:string;category:string;displayCategory?:string;description:string;private?:boolean;featured?:boolean;tier?:1|2|3;needsReview?:boolean;accent:string;monogram:string;role?:string;technologies:string[];status:string;website?:string;industry?:string;focus?:string[];visual?:'network'|'signal'|'modules'|'ledger'|'routes'|'campus'|'growth'|'legal';logo?:{src:string;width:number;height:number}};
 
-export const profile={name:'Geetha K S',brand:'GEETZ',role:'Senior AI Product Engineer',positioning:'Python Full-Stack Developer · AI Product Builder',company:'Kripra’s Digital AI Pvt. Ltd.',companyRole:'Founder',email:'geethasritnj@gmail.com',linkedin:'https://www.linkedin.com/in/geethaks20',github:'https://github.com/Geetz_tech',whatsapp:'https://wa.me/919361574733?text=Hi%20Geetha%2C%20I%20came%20across%20your%20portfolio%20and%20would%20like%20to%20connect%20regarding%20a%20project%20or%20collaboration.',companyWebsite:'https://kriprasdigitalai.com/en',resume:''};
+export const profile={name:'Geetha K S',brand:'GEETZ',role:'Chief Technology Officer',positioning:'CTO @ Krishvi International · AI & Enterprise Product Builder',company:'Krishvi International',companyRole:'Chief Technology Officer',email:'geethasritnj@gmail.com',linkedin:'https://www.linkedin.com/in/geethaks20',github:'https://github.com/Geetz_tech',whatsapp:'https://wa.me/919361574733?text=Hi%20Geetha%2C%20I%20came%20across%20your%20portfolio%20and%20would%20like%20to%20connect%20regarding%20a%20project%20or%20collaboration.',companyWebsite:'https://kriprasdigitalai.com/en',resume:''};
 
 export type Expertise={number:string;title:string;text:string;tags:string[];icon:'stack'|'spark'|'grid'|'layers'|'blueprint'|'loop';primary?:boolean};
 export const expertise:Expertise[]=[
@@ -13,14 +13,14 @@ export const expertise:Expertise[]=[
 ];
 
 export const products:Project[]=[
-  {name:'Farmora',category:'Intelligent Agriculture Platform',description:'AI-driven monitoring and management for advanced agricultural production environments.',private:true,featured:true,accent:'#51b99b',monogram:'FA',role:'Product development',technologies:['Python','FastAPI'],status:'Private commercial product',focus:['Intelligent monitoring','Production management'],visual:'growth'},
-  {name:'EDNORYX',category:'AI Education Platform',description:'Academic operations, student intelligence, parent engagement, and campus workflows in one digital environment.',private:true,featured:true,accent:'#8c6cff',monogram:'ED',role:'Product architecture & engineering',technologies:['Python','FastAPI','React'],status:'Private commercial product',focus:['Academic operations','Student intelligence','Campus workflows'],visual:'campus'},
-  {name:'StaffTract.AI',category:'AI Workforce & Recruitment Platform',displayCategory:'AI Workforce Intelligence',description:'AI-powered workforce and recruitment platform for hiring workflows, workforce operations, documentation control, deployment coordination, and intelligent automation.',private:true,featured:true,accent:'#7c72ff',monogram:'ST',role:'Product architecture & engineering',technologies:['Python','FastAPI','PostgreSQL','React','Multi-tenant SaaS'],status:'Private commercial product',focus:['Recruitment workflows','Workforce operations','Intelligent automation'],visual:'network'},
-  {name:'JusticeAngel',category:'AI-Powered Legal Intelligence',description:'AI-assisted legal intelligence platform designed to help structure legal information, analyse case-related content, and support more efficient legal research and decision workflows.',private:true,featured:true,accent:'#a87cff',monogram:'JA',role:'Product architecture & engineering',technologies:[],status:'Private commercial product',visual:'legal'},
-  {name:'KriPra SmartERP AI',category:'AI-Enabled Enterprise ERP Platform',displayCategory:'Enterprise Operations Platform',description:'Enterprise ERP platform for integrated business operations, workflow automation, modular enterprise processes, and intelligent digital operations.',private:true,featured:true,accent:'#b071ff',monogram:'SE',role:'Platform architecture & engineering',technologies:['Python','FastAPI','PostgreSQL'],status:'Proprietary product',focus:['Integrated operations','Modular processes','Workflow automation'],visual:'modules'},
-  {name:'Faturaix',category:'GST & E-Invoicing Compliance SaaS',description:'Compliance-focused invoicing platform supporting GST-oriented workflows and Saudi ZATCA-aligned digital invoicing requirements.',private:true,accent:'#9a8dff',monogram:'FX',technologies:[],status:'Private commercial product',focus:['Digital invoicing','GST-oriented workflows','ZATCA alignment'],visual:'ledger'},
-  {name:'Pyrosk AI',category:'AI Marketing & Lead Automation Platform',description:'AI-assisted marketing and lead automation platform for campaign workflows, digital engagement, lead management, and business growth automation.',private:true,accent:'#dd6dff',monogram:'PY',technologies:[],status:'Proprietary product',focus:['Campaign workflows','Lead management','Growth automation'],visual:'signal'},
-  {name:'Trade ERP / CRM',category:'Commodity & Trade Operations Platform',description:'Enterprise trade operations platform supporting procurement, logistics, documentation, CRM processes, and transaction visibility.',private:true,accent:'#6d9dff',monogram:'TR',technologies:[],status:'Private commercial product',focus:['Trade operations','Documentation flow','Transaction visibility'],visual:'routes'},
+  {name:'EDNORYX',category:'Education Intelligence Platform',description:'Education operations, student intelligence, and campus workflows in one platform. LMS, assessments, workflows, and AI-assisted teacher support systems in active development.',private:true,featured:true,tier:1,accent:'#8c6cff',monogram:'ED',role:'Product architecture & full-stack engineering',technologies:['Python','FastAPI','React','PostgreSQL'],status:'MVP · Active Development',focus:['Academic operations','Student intelligence','AI-assisted workflows'],visual:'campus'},
+  {name:'Enterprise ERP Platform',category:'Enterprise Operations Platform',displayCategory:'Modular Enterprise ERP',description:'Modular enterprise ERP platform for integrated business operations, workflow automation, and system integration. Multi-module architecture with partial AI integration in specific domains.',private:true,featured:true,tier:1,accent:'#b071ff',monogram:'SE',role:'Platform architecture & full-stack engineering',technologies:['Python','FastAPI','PostgreSQL','React'],status:'Working MVP · Active Development · Pre-commercial',focus:['Enterprise operations','Modular architecture','System integration','Workflow automation'],visual:'modules'},
+  {name:'Farmora',category:'Agriculture Technology Platform',description:'Controlled-environment monitoring and production management for advanced agricultural operations. Backend and platform architecture for environment, crop, and production tracking.',private:true,featured:true,tier:1,accent:'#51b99b',monogram:'FA',role:'Backend/domain architecture & engineering',technologies:['Python','FastAPI'],status:'In Development · MVP-oriented',focus:['Environment monitoring','Production management','Data collection & analysis'],visual:'growth'},
+  {name:'StaffTract.AI',category:'Recruitment & Workforce Intelligence Product',description:'Recruitment and workforce management product concept for hiring and workforce operations. Currently a development/demo-stage build; AI-assisted capabilities (parsing, matching, ranking) are part of the product direction, not yet implemented in running code.',private:true,featured:true,tier:2,accent:'#7c72ff',monogram:'ST',role:'Product concept & application architecture',technologies:['Python','FastAPI'],status:'Strategic Product · Development / Demo Stage',focus:['Recruitment workflows','Workforce operations'],visual:'network'},
+  {name:'JusticeAngel',category:'AI-Assisted Legal Technology Platform',displayCategory:'Strategic AI Product',description:'Legal intelligence platform exploring AI-assisted structuring of legal information and case research workflows.',private:true,featured:true,tier:2,accent:'#a87cff',monogram:'JA',role:'Product architecture & engineering',technologies:[],status:'',visual:'legal'},
+  {name:'Faturaix',category:'E-Invoicing Platform',description:'Invoicing platform supporting digital invoicing workflows.',private:true,featured:false,tier:3,accent:'#9a8dff',monogram:'FX',role:'Product exploration',technologies:[],status:'',focus:['Digital invoicing','Compliance workflows'],visual:'ledger'},
+  {name:'Pyrosk AI',category:'Marketing & Automation Platform',description:'Marketing and lead automation platform for campaign workflows.',private:true,featured:false,tier:3,accent:'#dd6dff',monogram:'PY',role:'Product exploration',technologies:[],status:'',focus:['Campaign workflows','Lead management'],visual:'signal'},
+  {name:'Trade ERP / CRM',category:'Trade Operations Platform',description:'Trade operations platform for procurement and logistics workflows.',private:true,featured:false,tier:3,accent:'#6d9dff',monogram:'TR',role:'Product exploration',technologies:[],status:'',focus:['Trade operations','Documentation flow'],visual:'routes'},
 ];
 
 export const clients:Project[]=[
@@ -40,7 +40,7 @@ export const technologyGroups=[
 
 export const outcomes=[
   {category:'Architecture',title:'Multi-Tenant SaaS Architecture',text:'Secure, role-aware application architecture designed around JWT/RBAC and maintainable enterprise workflows.'},
-  {category:'Automation',title:'AI Workflow Automation',text:'NLP/LLM-assisted processing integrated into production-oriented application workflows.'},
+  {category:'Automation',title:'AI Workflow Automation',text:'NLP/LLM-assisted processing integrated into working application workflows and development-stage product systems.'},
   {category:'Data Engineering',title:'Cloud / Data Migration',text:'Verified enterprise migration and testing experience involving Teradata, MS SQL Server, and Google Cloud.'},
   {category:'Delivery',title:'End-to-End Product Ownership',text:'Backend services, database design, API integrations, and React frontends delivered as a single accountable owner.'},
   {category:'Leadership',title:'Engineering Mentorship',text:'Code review and technical guidance for junior developers as part of ongoing engineering practice.'},
@@ -59,16 +59,12 @@ export type CurrentRole={label:string;role:string;org:string;type:string};
 export type JourneyItem={role:string;org:string;period:string;location:string;stage:string;detail:string;signals?:string[];currentRoles?:CurrentRole[]};
 export const journey:JourneyItem[]=[
   {
-    role:'Two concurrent roles',
-    org:'Professional practice & entrepreneurship',
-    period:'2025 — Present',
+    role:'Chief Technology Officer',
+    org:'Krishvi International',
+    period:'2024 — Present',
     location:'',
-    stage:'AI Product Engineering / Founder Leadership',
-    detail:'Two distinct dimensions of current professional work, held concurrently from 2025 to the present.',
-    currentRoles:[
-      {label:'Professional Role',role:'Senior AI Product Engineer',org:'Pragatham Solutions and Services OPC Pvt Ltd',type:'Professional Employment'},
-      {label:'Founder / Entrepreneurship',role:'Founder',org:'Kripra’s Digital AI Pvt. Ltd.',type:'Founder / Entrepreneurship'},
-    ],
+    stage:'Technology Leadership & AI Product Development',
+    detail:'Leading technology strategy and direction including strategic IT planning, system integration, digital transformation, software/product development, and introducing AI-focused projects into the technology direction.',
   },
   {
     role:'IT Consultant',
@@ -88,7 +84,7 @@ export const journey:JourneyItem[]=[
   },
   {
     role:'Data Test Engineer',
-    org:'Macy’s Digital / Cognizant',
+    org:'Macy\'s Digital / Cognizant',
     period:'05/2021 — 06/2022',
     location:'Chennai, India',
     stage:'Enterprise Systems',

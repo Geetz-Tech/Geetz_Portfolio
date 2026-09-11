@@ -253,9 +253,9 @@ export function GeetzIntro() {
 
         <p className="geetz-world-line">Where ideas are engineered into impact.</p>
         <p className="geetz-world-role">
-          <span>Software Engineer</span>
+          <span>CTO @ Krishvi International</span>
           <i aria-hidden="true">·</i>
-          <span>AI Product Builder</span>
+          <span>AI &amp; Enterprise Product Builder</span>
         </p>
       </div>
 
