@@ -60,7 +60,7 @@ export default function RootLayout({
           url: siteUrl,
           name: 'Geetha K S',
           alternateName: 'GEETZ',
-          jobTitle: 'Founder · Software Engineer · AI Product Builder',
+          jobTitle: 'Chief Technology Officer · AI & Enterprise Product Builder',
           email: 'mailto:geethasritnj@gmail.com',
           sameAs: [
             'https://www.linkedin.com/in/geethaks20',
@@ -68,8 +68,7 @@ export default function RootLayout({
           ],
           worksFor: {
             '@type': 'Organization',
-            name: 'Kripra’s Digital AI Pvt. Ltd.',
-            url: 'https://kriprasdigitalai.com/en',
+            name: 'Krishvi International',
           },
         }) }} />
       </body>

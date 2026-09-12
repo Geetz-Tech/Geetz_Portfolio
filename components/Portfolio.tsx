@@ -24,7 +24,7 @@ const PRODUCT_LOOP_SETS = 3;
 const nav = [
   { id: 'about', label: 'About', desc: 'CTO mindset, engineer’s discipline.' },
   { id: 'expertise', label: 'Expertise', desc: 'Full-stack engineering to AI integration.' },
-  { id: 'products', label: 'Products', desc: 'Selected commercial platforms.' },
+  { id: 'products', label: 'Products', desc: 'Flagship platforms, labeled by real stage.' },
   { id: 'client-work', label: 'Client Work', desc: 'Real businesses, real engagements.' },
   { id: 'journey', label: 'Journey', desc: 'Professional chronology, 2016 — present.' },
   { id: 'contact', label: 'Contact', desc: 'Start a conversation.' },
@@ -340,8 +340,17 @@ export function Portfolio() {
 
   useEffect(() => {
     const container = selected ? modalRef.current : menu ? menuRef.current : null;
-    document.body.style.overflow = container ? 'hidden' : '';
     if (!container) return;
+
+    // iOS Safari does not reliably block background touch-scroll with
+    // `overflow:hidden` on body alone — lock via position:fixed instead,
+    // then restore the exact scroll position on close.
+    const lockedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
 
     const focusable = Array.from(
       container.querySelectorAll<HTMLElement>(
@@ -372,7 +381,12 @@ export function Portfolio() {
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
       document.body.style.overflow = '';
+      window.scrollTo(0, lockedScrollY);
       lastFocus.current?.focus();
     };
   }, [selected, menu]);
@@ -775,7 +789,7 @@ export function Portfolio() {
           </div>
         </section>
 
-        <section id="about-redesign" className="section about-redesign-section">
+        <section id="about" className="section about-redesign-section">
           <div className="section-label reveal">
             <span>—</span> About
           </div>
@@ -800,7 +814,7 @@ export function Portfolio() {
                     />
                   </div>
                   <div className="id-badge-info">
-                    <h3>{profile.name}</h3>
+                    <p className="id-badge-name">{profile.name}</p>
                     <p>CTO · Software Engineer · Product Builder</p>
                     <span className="id-badge-org">Krishvi International</span>
                   </div>
@@ -824,7 +838,7 @@ export function Portfolio() {
             </div>
 
             <div className="about-bio-col">
-              <h3>Technology leadership meets engineering.</h3>
+              <h2>Technology leadership meets engineering.</h2>
               <p>
                 I&apos;m a hands-on CTO and software engineer building enterprise
                 platforms and AI-enabled products. My approach: start with the
@@ -850,7 +864,7 @@ export function Portfolio() {
             </div>
 
             <div className="about-career-col">
-              <h4>Career Progression</h4>
+              <h3>Career Progression</h3>
               <div className="career-flow-item">
                 <span>2017</span>
                 <strong>Software Engineering</strong>
@@ -960,7 +974,7 @@ export function Portfolio() {
                             <div
                               className="arch-layer-row"
                               tabIndex={0}
-                              style={{ '--arch-d': `${li * 340}ms` } as React.CSSProperties}
+                              style={{ '--arch-d': `${li * 230}ms` } as React.CSSProperties}
                             >
                               <span className="arch-layer-name">{layer.label}</span>
                               <span className="arch-layer-items">{layer.items.join(' · ')}</span>
@@ -971,7 +985,7 @@ export function Portfolio() {
                                 viewBox="0 0 2 16"
                                 preserveAspectRatio="none"
                                 aria-hidden="true"
-                                style={{ '--arch-d': `${li * 340 + 170}ms` } as React.CSSProperties}
+                                style={{ '--arch-d': `${li * 230 + 115}ms` } as React.CSSProperties}
                               >
                                 <line pathLength="1" x1="1" y1="0" x2="1" y2="16" />
                               </svg>
@@ -979,14 +993,14 @@ export function Portfolio() {
                           </div>
                         ))}
                         {arch.intelligence && (
-                          <div className="arch-branch" style={{ '--arch-d': `${arch.layers.length * 340}ms` } as React.CSSProperties}>
+                          <div className="arch-branch" style={{ '--arch-d': `${arch.layers.length * 230}ms` } as React.CSSProperties}>
                             <svg className="arch-branch-svg" viewBox="0 0 22 16" preserveAspectRatio="none" aria-hidden="true">
                               <path pathLength="1" d="M1,0 L1,9 Q1,14 6,14 L22,14" fill="none" />
                             </svg>
                             <div
                               className="arch-intelligence"
                               tabIndex={0}
-                              style={{ '--arch-d': `${arch.layers.length * 340 + 160}ms` } as React.CSSProperties}
+                              style={{ '--arch-d': `${arch.layers.length * 230 + 110}ms` } as React.CSSProperties}
                             >
                               <span className="arch-layer-name">Intelligence layer <em>(optional / where applicable)</em></span>
                               <span className="arch-layer-items">{arch.intelligence.items.join(' · ')}</span>
@@ -1297,7 +1311,11 @@ export function Portfolio() {
                   {careerJourney.map((item, index) => {
                     const isCurrentCTO = item.org === 'Krishvi International';
                     return (
-                    <li className={`${activeJourney === index ? 'active' : ''} ${isCurrentCTO ? 'current' : ''}`} key={item.org + item.period}>
+                    <li
+                      className={`${activeJourney === index ? 'active' : ''} ${isCurrentCTO ? 'current' : ''}`}
+                      key={item.org + item.period}
+                      style={{ '--d': `${(index / Math.max(careerJourney.length - 1, 1)) * 850}ms` } as React.CSSProperties}
+                    >
                       <button onClick={() => setActiveJourney(index)} aria-pressed={activeJourney === index}>
                         <span>{item.period.split('—')[0].trim()}</span>
                         <i aria-hidden="true" />
@@ -1421,9 +1439,9 @@ export function Portfolio() {
                 <em>Protected responsibly.</em>
               </h2>
               <span>
-                Selected commercial products are maintained in private
-                repositories to protect proprietary technology and client
-                confidentiality.
+                Product and client repositories are kept private to protect
+                proprietary technology and confidentiality at their current
+                development stage.
               </span>
             </div>
             <ExternalLink className="round-link" href={profile.github}>
@@ -1559,7 +1577,9 @@ export function Portfolio() {
               {selected.category && <em>{selected.category}</em>}
             </div>
             <div className="modal-content">
-              {!selected.needsReview && <p>{selected.private ? 'Private commercial product' : 'Client project'}</p>}
+              {!selected.needsReview && (
+                <p>{selected.status || (selected.private ? 'Private repository' : 'Client project')}</p>
+              )}
               <h2 id="modal-title">{selected.name}</h2>
               <div className="modal-grid">
                 {selected.description && <div>

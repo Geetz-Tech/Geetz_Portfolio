@@ -95,7 +95,7 @@ export function SectorsSection() {
     setActiveDomain((cur) => (cur === id ? null : cur));
     const el = cardRefs.current[id];
     if (!el) return;
-    el.style.transition = 'transform .45s cubic-bezier(.22,.68,.32,1)';
+    el.style.transition = 'transform .3s var(--ease-soft)';
     el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
   };
 
